@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout linearLayout;
     private TextView textView;
     private ImageView imageView;
-    protected RelativeLayout.LayoutParams imageParams;
+    protected LinearLayout.LayoutParams params ;
 
     private float initialX, initialY;
 
@@ -41,8 +41,7 @@ public class MainActivity extends AppCompatActivity {
         Android_Gesture_Detector androidGestureDetector = new Android_Gesture_Detector();
         gestureDetector = new GestureDetector(this, androidGestureDetector);
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        imageView.setLayoutParams(params);
+//        imageView.setLayoutParams(params);
 
 
     }
@@ -60,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     class Android_Gesture_Detector implements GestureDetector.OnGestureListener,
             GestureDetector.OnDoubleTapListener {
         private float baseX, baseY;
+        int left=0;
 
         @Override
         public boolean onDown(MotionEvent e) {
@@ -119,10 +119,11 @@ public class MainActivity extends AppCompatActivity {
             if (e1.getY() > e2.getY()) {
                 Log.d("Gesture ", " Scroll Up");
             }
-
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             if (e2.getX() > e1.getX()) {
-                textView.setX(baseX + e2.getX() - e1.getX());
-//                linearLayout.
+                left =  (int) (e2.getX() - e1.getX());
+
+                params.setMargins(left,0,0,0);
             }
 //            imageView.setY(baseY+e2.getY()-e1.getY());
 //            if (textView.getVisibility()==View.GONE && e1.getX()-e2.getX()>0){
@@ -130,8 +131,10 @@ public class MainActivity extends AppCompatActivity {
 //                textView.setX(baseX+e2.getX()-e1.getX());
 //            }
 
+
+            textView.setLayoutParams(params);
             linearLayout.invalidate();
-            imageView.invalidate();
+//            imageView.invalidate();
 
             return true;
         }
