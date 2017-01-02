@@ -1,12 +1,15 @@
 package com.ipvision.sulaiman.gesturetest_sitepoint;
 
+import android.animation.ValueAnimator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -55,6 +58,33 @@ public class MainActivity extends AppCompatActivity {
         // The default implementation always returns false.
     }
 
+    public int getDisplayWidth(){
+        Display display = getWindowManager().getDefaultDisplay();
+        return display.getWidth();
+    }
+    public int getDisplayHeight(){
+        Display display = getWindowManager().getDefaultDisplay();
+        return display.getHeight();
+    }
+
+    public void startMoveRightLayoutAnimation(float startPosition, float endPosition){
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat(startPosition,endPosition);
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                //3
+                float value = (float) animation.getAnimatedValue();
+                //4
+                linearLayout.setTranslationX(value);
+            }
+        });
+
+//5
+        valueAnimator.setInterpolator(new LinearInterpolator());
+        valueAnimator.setDuration(500);
+//6
+        valueAnimator.start();
+    }
 
     class Android_Gesture_Detector implements GestureDetector.OnGestureListener,
             GestureDetector.OnDoubleTapListener {
@@ -63,12 +93,11 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean onDown(MotionEvent e) {
-            Log.d("onDown", textView.getX() + " " + textView.getY());
             Log.d("Gesture ", " onDown");
-            baseX = imageView.getX();
-            baseY = imageView.getY();
-            imageView.setVisibility(View.VISIBLE);
+            baseX = linearLayout.getX();
+            baseY = linearLayout.getY();
             Log.d("base value in onDown ", baseX + " " + baseY);
+//            startMoveLayoutAnimation();
             return true;
         }
 
@@ -81,8 +110,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
             Log.d("Gesture ", " onSingleTapUp");
+            Log.d("Linear",linearLayout.getX()+" ");
             return true;
         }
+
+
 
         @Override
         public void onShowPress(MotionEvent e) {
@@ -106,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Gesture ", " onLongPress");
         }
 
+
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             Log.d("onScroll", " " + textView.getX() + " " + textView.getY());
@@ -119,12 +152,22 @@ public class MainActivity extends AppCompatActivity {
             if (e1.getY() > e2.getY()) {
                 Log.d("Gesture ", " Scroll Up");
             }
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            if (e2.getX() > e1.getX()) {
-                left =  (int) (e2.getX() - e1.getX());
 
-                params.setMargins(left,0,0,0);
+            if (e2.getX() > e1.getX()) {
+                float updatedX = baseX+(e2.getX()-e1.getX());
+                linearLayout.setX(updatedX);
             }
+            else {
+                if (linearLayout.getVisibility() == View.GONE)
+                    linearLayout.setVisibility(View.VISIBLE);
+
+                float updatedX = baseX+(e2.getX()-e1.getX());
+
+                if (updatedX>=0)
+                    linearLayout.setX(updatedX);
+            }
+
+
 //            imageView.setY(baseY+e2.getY()-e1.getY());
 //            if (textView.getVisibility()==View.GONE && e1.getX()-e2.getX()>0){
 //                textView.setVisibility(View.VISIBLE);
@@ -132,7 +175,8 @@ public class MainActivity extends AppCompatActivity {
 //            }
 
 
-            textView.setLayoutParams(params);
+
+            Log.d("Linear"," "+linearLayout.getX());
             linearLayout.invalidate();
 //            imageView.invalidate();
 
@@ -146,11 +190,13 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Gesture ", "Left to Right swipe: " + e1.getX() + " - " + e2.getX());
                 Log.d("Speed ", String.valueOf(velocityX) + " pixels/second");
 //                textView.setVisibility(View.GONE);
+                startMoveRightLayoutAnimation(e2.getX(),getDisplayWidth()+20);
+//                linearLayout.setVisibility(View.GONE);
             }
             if (e1.getX() > e2.getX()) {
                 Log.d("Gesture ", "Right to Left swipe: " + e1.getX() + " - " + e2.getX());
                 Log.d("Speed ", String.valueOf(velocityX) + " pixels/second");
-                textView.setVisibility(View.VISIBLE);
+                startMoveRightLayoutAnimation(linearLayout.getX(),0);
             }
             if (e1.getY() < e2.getY()) {
                 Log.d("Gesture ", "Up to Down swipe: " + e1.getX() + " - " + e2.getX());
