@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         return display.getHeight();
     }
 
-    public void startMoveRightLayoutAnimation(float startPosition, float endPosition){
+    public void startMoveLayoutAnimation(float startPosition, float endPosition){
         ValueAnimator valueAnimator = ValueAnimator.ofFloat(startPosition,endPosition);
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -190,13 +190,13 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Gesture ", "Left to Right swipe: " + e1.getX() + " - " + e2.getX());
                 Log.d("Speed ", String.valueOf(velocityX) + " pixels/second");
 //                textView.setVisibility(View.GONE);
-                startMoveRightLayoutAnimation(e2.getX(),getDisplayWidth()+20);
+                startMoveLayoutAnimation(e2.getX(),getDisplayWidth()+20);
 //                linearLayout.setVisibility(View.GONE);
             }
             if (e1.getX() > e2.getX()) {
                 Log.d("Gesture ", "Right to Left swipe: " + e1.getX() + " - " + e2.getX());
                 Log.d("Speed ", String.valueOf(velocityX) + " pixels/second");
-                startMoveRightLayoutAnimation(linearLayout.getX(),0);
+                startMoveLayoutAnimation(linearLayout.getX(),0);
             }
             if (e1.getY() < e2.getY()) {
                 Log.d("Gesture ", "Up to Down swipe: " + e1.getX() + " - " + e2.getX());
